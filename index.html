@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WWG - Ghosts 'n Goblins Clone</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      background: #0a0a0a; 
+      width: 100%; 
+      height: 100%; 
+      overflow: hidden; 
+      font-family: 'Courier New', monospace;
+    }
+    #game-container {
+      z-index: 10;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      position: relative;
+    }
+    canvas { display: block; }
+    .loading-overlay {
+      color: #e0e0e0;
+      z-index: 1000;
+      background: #1a1a1a;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      position: fixed;
+      inset: 0;
+    }
+    .loading-bar {
+      background: #333;
+      border-radius: 4px;
+      width: 300px;
+      height: 8px;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+    .loading-fill {
+      background: #4ade80;
+      width: 0%;
+      height: 100%;
+      transition: width 0.1s;
+    }
+    #touch-controls {
+      pointer-events: auto;
+      z-index: 100;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 10px;
+      display: flex;
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+    }
+    .dpad { flex-direction: column; align-items: center; gap: 4px; display: flex; }
+    .dpad-row { align-items: center; gap: 4px; display: flex; }
+    .dpad-spacer, .dpad-center { width: 44px; height: 44px; }
+    .dpad-btn {
+      color: #fff;
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: none;
+      background: #ffffff26;
+      border: 2px solid #fff6;
+      border-radius: 10px;
+      justify-content: center;
+      align-items: center;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+    }
+    .dpad-btn:active { background: #ffffff59; }
+    .action-buttons { align-items: flex-end; gap: 12px; display: flex; }
+    .action-btn {
+      color: #fff;
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: none;
+      border: 2px solid #ffffff80;
+      border-radius: 28px;
+      justify-content: center;
+      align-items: center;
+      width: 56px;
+      height: 56px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+    }
+    .action-btn.attack { background: #ff505040; border-color: #ff787899; }
+    .action-btn.jump { background: #5078ff40; border-color: #78b4ff99; }
+    .action-btn.special { background: #c850ff40; border-color: #f078ff99; }
+    .action-btn:active { background: #fff3; }
+    @media (min-width: 769px) { #touch-controls { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div class="loading-overlay" id="loading">
+      <div>
+        <div style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">WWG</div>
+        <div style="color: #888; font-size: 14px;">Ghosts 'n Goblins Clone</div>
+        <div class="loading-bar"><div class="loading-fill" id="loading-fill"></div></div>
+        <div style="margin-top: 16px; color: #666; font-size: 12px;">Loading assets...</div>
+      </div>
+    </div>
+  </div>
+  <div id="touch-controls">
+    <div class="dpad">
+      <div class="dpad-row"><div class="dpad-spacer"></div><button class="dpad-btn" data-dir="up">▲</button><div class="dpad-spacer"></div></div>
+      <div class="dpad-row"><button class="dpad-btn" data-dir="left">◀</button><div class="dpad-center"></div><button class="dpad-btn" data-dir="right">▶</button></div>
+      <div class="dpad-row"><div class="dpad-spacer"></div><button class="dpad-btn" data-dir="down">▼</button><div class="dpad-spacer"></div></div>
+    </div>
+    <div class="action-buttons">
+      <button class="action-btn jump" data-action="jump">JUMP</button>
+      <button class="action-btn attack" data-action="attack">ATTACK</button>
+      <button class="action-btn special" data-action="special">MAGIC</button>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
