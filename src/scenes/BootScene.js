@@ -17,50 +17,12 @@ export class BootScene extends Phaser.Scene {
     })
     this.load.on('complete', () => { progressBar.destroy() })
 
-    // Try to load external assets (will fail gracefully)
-    this.load.on('loaderror', (file) => {
-      console.warn('Failed to load:', file.key, file.url)
-    })
-
-    // Background images (procedural fallback will be used)
-    for (let i = 1; i <= 5; i++) {
-      this.load.image(`bg${i}`, `assets/images/bg${i}.png`)
-    }
-
-    // Character spritesheet
-    this.load.atlas('arthur', 'assets/images/arthur.png', 'assets/images/arthur.json')
-
-    // Enemy sprites
-    const enemies = ['zombi', 'goblin', 'ocell', 'escuder', 'saltarin']
-    enemies.forEach(e => {
-      this.load.atlas(e, `assets/images/${e}.png`, `assets/images/${e}.json`)
-    })
-
-    // Weapons
-    for (let i = 0; i < 5; i++) {
-      this.load.image(`arma${i}`, `assets/images/arma${i}.png`)
-    }
-
-    // UI elements
-    this.load.image('armor', 'assets/images/armor.png')
-    this.load.image('key', 'assets/images/key.png')
-    this.load.image('door', 'assets/images/door.png')
-    this.load.image('ladder', 'assets/images/ladder.png')
-    this.load.image('platform', 'assets/images/platform.png')
-    this.load.image('wall', 'assets/images/wall.png')
-
-    // Audio
-    this.load.audio('jump', 'assets/audio/jump.mp3')
-    this.load.audio('attack', 'assets/audio/attack.mp3')
-    this.load.audio('hurt', 'assets/audio/hurt.mp3')
-    this.load.audio('death', 'assets/audio/death.mp3')
-    this.load.audio('pickup', 'assets/audio/pickup.mp3')
-    this.load.audio('bgm1', 'assets/audio/bgm1.mp3')
-    this.load.audio('bgm2', 'assets/audio/bgm2.mp3')
+    // NO EXTERNAL ASSETS - everything is procedural
+    // This prevents the loader from hanging on missing files
   }
 
   create() {
-    // Generate procedural fallback textures for all assets
+    // Generate all procedural textures
     this.createProceduralTextures()
     
     // Start main scene
@@ -69,7 +31,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   createProceduralTextures() {
-    // Arthur sprites (19 frames: idle, walk, jump, bend, shoot, hurt, die)
+    // Arthur sprites (24 frames: idle, walk, jump, bend, shoot, hurt, die, climb)
     this.createArthurTextures()
     
     // Enemy textures
@@ -86,14 +48,15 @@ export class BootScene extends Phaser.Scene {
   }
 
   createArthurTextures() {
-    // Frame mapping:
+    // Frame mapping (24 frames):
     // 0: idle right, 1: idle left
-    // 2-5: walk right (4 frames), 6-9: walk left
+    // 2-5: walk right (4 frames), 6-9: walk left (4 frames)
     // 10-11: jump right/left
     // 12-13: bend right/left
     // 14-17: shoot right/left (4 frames)
     // 18-19: hurt right/left
     // 20-23: die right/left (4 frames)
+    // 24-25: climb right/left
     
     const frames = [
       // idle right
@@ -144,6 +107,10 @@ export class BootScene extends Phaser.Scene {
       (g) => { g.fillStyle(0x8B4513); g.fillRect(12, 16, 16, 16); g.fillStyle(0xFF0000); g.fillRect(8, 12, 24, 8); g.fillStyle(0xC0C0C0); g.fillRect(8, 20, 8, 12); g.fillRect(24, 20, 8, 12); },
       // die 2 left
       (g) => { g.fillStyle(0x8B4513); g.fillRect(12, 20, 16, 12); g.fillStyle(0xFF0000); g.fillRect(8, 16, 24, 8); g.fillStyle(0xC0C0C0); g.fillRect(8, 16, 8, 16); g.fillRect(24, 24, 8, 8); },
+      // climb right
+      (g) => { g.fillStyle(0x8B4513); g.fillRect(12, 16, 16, 16); g.fillStyle(0xFFD700); g.fillRect(8, 12, 24, 8); g.fillStyle(0xC0C0C0); g.fillRect(24, 16, 8, 16); g.fillRect(8, 24, 8, 12); },
+      // climb left
+      (g) => { g.fillStyle(0x8B4513); g.fillRect(12, 16, 16, 16); g.fillStyle(0xFFD700); g.fillRect(8, 12, 24, 8); g.fillStyle(0xC0C0C0); g.fillRect(8, 16, 8, 16); g.fillRect(24, 24, 8, 12); },
     ]
 
     frames.forEach((drawFn, i) => {
@@ -154,11 +121,6 @@ export class BootScene extends Phaser.Scene {
         g.generateTexture(key, 40, 40)
       }
     })
-
-    // Create atlas JSON
-    const atlasFrames = frames.map((_, i) => ({ frame: { x: 0, y: 0, w: 40, h: 40 }, filename: `arthur_${i}.png` }))
-    const atlasData = { frames: atlasFrames.reduce((acc, f, i) => { acc[`arthur_${i}.png`] = f.frame; return acc }, {}), meta: { image: 'arthur.png', size: { w: 40, h: 40 } } }
-    this.cache.json.add('arthur_atlas', atlasData)
   }
 
   createEnemyTextures() {
@@ -221,7 +183,7 @@ export class BootScene extends Phaser.Scene {
       }
     })
 
-    // Escuder (shield bearer, gray/blue)
+    // Escuder (shield bearer)
     for (let i = 0; i < 2; i++) {
       const g = this.make.graphics({ x: 0, y: 0, add: false })
       g.fillStyle(0x4682B4)
@@ -235,7 +197,7 @@ export class BootScene extends Phaser.Scene {
       g.generateTexture(`escuder_${i}`, 50, 60)
     }
 
-    // Saltarin (jumper, purple)
+    // Saltarin (jumper)
     for (let i = 0; i < 2; i++) {
       const g = this.make.graphics({ x: 0, y: 0, add: false })
       g.fillStyle(0x8A2BE2)
@@ -380,7 +342,8 @@ export class BootScene extends Phaser.Scene {
       g.fillStyle(color)
       g.fillRect(0, 0, 1280, 720)
       // Add some parallax elements
-      g.fillStyle(Phaser.Display.Color.GetColor32(color).color & 0xFFFFFF | 0x202020)
+      const lighter = Phaser.Display.Color.GetColor32(color).color + 0x202020
+      g.fillStyle(lighter & 0xFFFFFF)
       for (let x = 0; x < 1280; x += 64) {
         for (let y = 0; y < 720; y += 64) {
           if (Math.random() < 0.1) g.fillRect(x, y, 32, 32)
